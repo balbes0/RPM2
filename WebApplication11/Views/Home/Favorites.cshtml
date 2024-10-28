@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Избранное";
+}
+
+<div class="row">
+    @for (int i = 0; i < 10; i++)
+    {
+        <div class="col-md-3 mb-3">
+            <div class="card" style="width: 18rem;">
+                <img src="~/img/КРОВАТЬ.png" class="card-img-top" alt="Кровать">
+                <div class="card-body">
+                    <h5 class="card-title">Пельмень пельменский</h5>
+                    <p class="card-text">Вкусно и точка</p>
+                    <div class="d-flex justify-content-between">
+                        <a href="#" class="btn btn-primary">В корзину</a>
+                        <a href="#" class="btn btn-secondary">Из избранного</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
