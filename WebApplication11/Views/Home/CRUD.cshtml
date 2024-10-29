@@ -1,15 +1,25 @@
 ﻿@model IEnumerable<WebApplication11.Models.Catalog>
 @{
     ViewData["Title"] = "Управление пользователями";
+    // Базовый путь к папке, где находятся ваши изображения
+    string basePath = "img"; // Или "wwwroot/img" в зависимости от контекста
+    string fullPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", basePath);
+
+    // Получаем относительные пути к файлам
+    var fileNames = Directory.GetFiles(fullPath)
+                              .Select(file => System.IO.Path.Combine(basePath, System.IO.Path.GetFileName(file))) // Формируем относительный путь
+                              .ToList();
+
+    string[] categories = new string[] { "Барашка", "Свинина", "Говядина" };
 }
 
 <div class="container mt-4">
     <h2>Каталог товаров</h2>
-    <button class="btn btn-success mb-3" id="addProductButton">Добавить новый продукт</button>
+    <form asp-action="Create" asp-controller="home">
+        <button class="btn btn-success mb-3">Добавить новый продукт</button>
+    </form>
 
-    <!-- Контейнер для динамически добавляемых карточек -->
     <div id="productContainer">
-        <!-- Пример карточек из модели -->
         @foreach (var item in Model)
         {
             <div class="card mb-3">
@@ -38,11 +48,29 @@
                         </div>
                         <div class="col-md-3">
                             <label for="productCategory" class="form-label">Категория</label>
-                            <input type="text" class="form-control" id="CategoryName" name="CategoryName" value="@item.CategoryName">
+                            <select type="text" class="form-control" id="CategoryName" name="CategoryName" value="@item.CategoryName">
+                                <option>@item.CategoryName</option>
+                                @foreach (string categoria in categories)
+                                {
+                                    if (categoria != item.CategoryName)
+                                    {
+                                        <option>@categoria</option>
+                                    }
+                                }
+                            </select>
                         </div>
                         <div class="col-md-3">
                             <label for="productImagePath" class="form-label">Путь к изображению</label>
-                            <input type="text" class="form-control" id="PathToImage" name="PathToImage" value="@item.PathToImage">
+                            <select type="text" class="form-control" id="PathToImage" name="PathToImage" value="@item.PathToImage">
+                                <option>@item.PathToImage</option>
+                                @foreach (string file in fileNames)
+                                {
+                                    if (file != item.PathToImage)
+                                    {
+                                        <option>@file</option>
+                                    }
+                                }
+                            </select>
                         </div>
                         <div class="col-md-12 d-flex justify-content-end mt-3">
                             <button type="submit" class="btn btn-primary me-2">Сохранить</button>
@@ -57,63 +85,4 @@
             </div>
         }
     </div>
-
-    <!-- Шаблон карточки, скрытый для клонирования -->
-    <div class="card mb-3 product-card" style="display: none;">
-        <div class="card-body">
-            <form class="row g-3 align-items-center">
-                <div class="col-md-3">
-                    <label class="form-label">Название</label>
-                    <input type="text" class="form-control" placeholder="Название продукта">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Описание</label>
-                    <input type="text" class="form-control" placeholder="Описание">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Цена</label>
-                    <input type="text" class="form-control" placeholder="Цена">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Вес (г)</label>
-                    <input type="text" class="form-control" placeholder="Вес">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">В наличии</label>
-                    <input type="text" class="form-control" placeholder="Количество">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Категория</label>
-                    <input type="text" class="form-control" placeholder="Категория">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Путь к изображению</label>
-                    <input type="text" class="form-control" placeholder="Путь к изображению">
-                </div>
-                <div class="col-md-12 d-flex justify-content-end mt-3">
-                    <button type="button" class="btn btn-primary me-2">Сохранить</button>
-                    <button type="button" class="btn btn-danger deleteBtn">Удалить</button>
-                </div>
-            </form>
-        </div>
-    </div>
 </div>
-
-<script>
-    document.getElementById('addProductButton').addEventListener('click', function () {
-        // Клонирование скрытого шаблона карточки
-        const productCardTemplate = document.querySelector('.product-card');
-        const newCard = productCardTemplate.cloneNode(true);
-
-        // Сброс значений в полях ввода
-        const inputs = newCard.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.value = ''; // Устанавливаем пустые значения
-            input.placeholder = input.placeholder; // Сохраняем текст-заполнитель
-        });
-
-        // Отображение клонированной карточки
-        newCard.style.display = 'block';
-        document.getElementById('productContainer').appendChild(newCard);
-    });
-</script>

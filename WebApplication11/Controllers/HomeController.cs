@@ -12,7 +12,21 @@ namespace WebApplication11.Controllers
         {
             db = pm2Context;
         }
-
+        [HttpPost]
+        public async Task<IActionResult> Create()
+        {
+            Catalog catalog = new Catalog();
+            catalog.ProductName = "Измените название";
+            catalog.Description = "Измените описание";
+            catalog.Price = 0;
+            catalog.Weight = 0;
+            catalog.Stock = 0;
+            catalog.CategoryName = "Измените категорию";
+            catalog.PathToImage = "Измените картинку";
+            db.Catalogs.Add(catalog);
+            await db.SaveChangesAsync();
+            return RedirectToAction("CRUD");
+        }
         [HttpPost]
         public async Task<IActionResult> Edit(Catalog product)
         {

@@ -56,19 +56,22 @@
     <div class="row">
         @foreach (var item in Model)
         {
-            <div class="col-md-3 mb-3">
-                <div class="card" style="width: 18rem;">
-                    <img src="@item.PathToImage" class="card-img-top" alt="not found">
-                    <div class="card-body">
-                        <h5 class="card-title">@item.ProductName</h5>
-                        <p class="card-text">@item.Description</p>
-                        <div class="d-flex justify-content-between">
-                            <a href="#" class="btn btn-primary">В корзину</a>
-                            <a href="#" class="btn btn-secondary">В избранное</a>
+            if (item.Stock > 0)
+            {
+                <div class="col-md-3 mb-3">
+                    <div class="card" style="width: 18rem;">
+                        <img src="@item.PathToImage" class="card-img-top" alt="not found">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.ProductName</h5>
+                            <p class="card-text">@item.Description</p>
+                            <div class="d-flex justify-content-between">
+                                <a href="#" class="btn btn-primary">В корзину</a>
+                                <a href="#" class="btn btn-secondary">В избранное</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            }
         }
     </div>
 </div>
