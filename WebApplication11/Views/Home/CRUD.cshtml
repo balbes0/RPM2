@@ -1,5 +1,119 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<WebApplication11.Models.Catalog>
 @{
+    ViewData["Title"] = "Управление пользователями";
 }
+
+<div class="container mt-4">
+    <h2>Каталог товаров</h2>
+    <button class="btn btn-success mb-3" id="addProductButton">Добавить новый продукт</button>
+
+    <!-- Контейнер для динамически добавляемых карточек -->
+    <div id="productContainer">
+        <!-- Пример карточек из модели -->
+        @foreach (var item in Model)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <form asp-action="Edit" asp-controller="home" method="post" class="row g-3 align-items-center">
+                        <input type="hidden" name="IdProduct" value="@item.IdProduct">
+                        <div class="col-md-3">
+                            <label for="productName" class="form-label">Название</label>
+                            <input type="text" class="form-control" id="ProductName" name="ProductName" value="@item.ProductName">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="productDescription" class="form-label">Описание</label>
+                            <input type="text" class="form-control" id="Description" name="Description" value="@item.Description">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="productPrice" class="form-label">Цена</label>
+                            <input type="text" class="form-control" id="Price" name="Price" value="@item.Price">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="productWeight" class="form-label">Вес (г)</label>
+                            <input type="text" class="form-control" id="Weight" name="Weight" value="@item.Weight">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="productStock" class="form-label">В наличии</label>
+                            <input type="text" class="form-control" id="Stock" name="Stock" value="@item.Stock">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="productCategory" class="form-label">Категория</label>
+                            <input type="text" class="form-control" id="CategoryName" name="CategoryName" value="@item.CategoryName">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="productImagePath" class="form-label">Путь к изображению</label>
+                            <input type="text" class="form-control" id="PathToImage" name="PathToImage" value="@item.PathToImage">
+                        </div>
+                        <div class="col-md-12 d-flex justify-content-end mt-3">
+                            <button type="submit" class="btn btn-primary me-2">Сохранить</button>
+                        </div>
+                    </form>
+
+                    <form asp-action="Delete" asp-controller="home" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@item.IdProduct">
+                        <button type="submit" class="btn btn-danger">Удалить</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Шаблон карточки, скрытый для клонирования -->
+    <div class="card mb-3 product-card" style="display: none;">
+        <div class="card-body">
+            <form class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <label class="form-label">Название</label>
+                    <input type="text" class="form-control" placeholder="Название продукта">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Описание</label>
+                    <input type="text" class="form-control" placeholder="Описание">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Цена</label>
+                    <input type="text" class="form-control" placeholder="Цена">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Вес (г)</label>
+                    <input type="text" class="form-control" placeholder="Вес">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">В наличии</label>
+                    <input type="text" class="form-control" placeholder="Количество">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Категория</label>
+                    <input type="text" class="form-control" placeholder="Категория">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Путь к изображению</label>
+                    <input type="text" class="form-control" placeholder="Путь к изображению">
+                </div>
+                <div class="col-md-12 d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-primary me-2">Сохранить</button>
+                    <button type="button" class="btn btn-danger deleteBtn">Удалить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('addProductButton').addEventListener('click', function () {
+        // Клонирование скрытого шаблона карточки
+        const productCardTemplate = document.querySelector('.product-card');
+        const newCard = productCardTemplate.cloneNode(true);
+
+        // Сброс значений в полях ввода
+        const inputs = newCard.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.value = ''; // Устанавливаем пустые значения
+            input.placeholder = input.placeholder; // Сохраняем текст-заполнитель
+        });
+
+        // Отображение клонированной карточки
+        newCard.style.display = 'block';
+        document.getElementById('productContainer').appendChild(newCard);
+    });
+</script>

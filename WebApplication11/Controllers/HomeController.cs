@@ -12,38 +12,38 @@ namespace WebApplication11.Controllers
         {
             db = pm2Context;
         }
-        //
-        [HttpPost]
-        public async Task<IActionResult> Create(User user)
-        {
-            db.Users.Add(user);
-            await db.SaveChangesAsync();
-            return RedirectToAction("CRUD");
-        }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(User user)
+        public async Task<IActionResult> Edit(Catalog product)
         {
-            db.Users.Update(user);
-            await db.SaveChangesAsync();
-            return RedirectToAction("CRUD");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Delete (int? id)
-        {
-            User user = await db.Users.FirstOrDefaultAsync(p => p.IdUser == id);
-            if (user != null)
+            if (ModelState.IsValid)
             {
-                db.Users.Remove(user);
+                db.Catalogs.Update(product);
                 await db.SaveChangesAsync();
                 return RedirectToAction("CRUD");
             }
             return NotFound();
         }
-        public IActionResult CRUD()
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int? id)
         {
-            return View();
+            if (id != null)
+            {
+                Catalog catalog = await db.Catalogs.FirstOrDefaultAsync(c => c.IdProduct == id);
+                if (catalog != null)
+                {
+                    db.Catalogs.Remove(catalog);
+                    await db.SaveChangesAsync();
+                    return RedirectToAction("CRUD");
+                }
+            }
+            return NotFound();
+        }
+
+        public async Task<IActionResult> CRUD()
+        {
+            return View(await db.Catalogs.ToListAsync());
         }
 
         public async Task<IActionResult> Index()
