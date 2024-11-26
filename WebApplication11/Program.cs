@@ -1,21 +1,25 @@
 using Microsoft.EntityFrameworkCore;
 
-
-
-
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Добавление сессий
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);  // Настройка времени жизни сессии
+    options.Cookie.HttpOnly = true;                   // Ограничение доступа cookie только сервером
+    options.Cookie.IsEssential = true;                // Устанавливает cookie как обязательное
+});
+
+builder.Services.AddDbContext<WebApplication11.Models.Rpm2Context>(x =>
+    x.UseSqlServer(builder.Configuration.GetConnectionString("con")));
+
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<WebApplication11.Models.Rpm2Context>(x => x.UseSqlServer(builder.Configuration.GetConnectionString("con")));
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -23,6 +27,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSession();  // Добавление сессий
 
 app.UseAuthorization();
 

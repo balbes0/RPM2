@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var isAuthenticated = Context.Session.GetString("IsAuthenticated");
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -39,12 +43,21 @@
                         </li>
                     </ul>
                     <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Authorization">Войти</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Registration">Регистрация</a>
-                        </li>
+                        @if (isAuthenticated != "true")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Authorization">Войти</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Registration">Регистрация</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Profile">Профиль</a>
+                            </li>
+                        }
                     </ul>
                 </div>
 

@@ -31,6 +31,8 @@ public partial class Rpm2Context : DbContext
 
     public virtual DbSet<PosOrder> PosOrders { get; set; }
 
+    public virtual DbSet<Role> Roles { get; set; }
+
     public virtual DbSet<StatusOrder> StatusOrders { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -51,6 +53,10 @@ public partial class Rpm2Context : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+            entity.Property(e => e.PathToImage)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasDefaultValue("нет картинка началника");
             entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.ProductName)
                 .HasMaxLength(100)
@@ -203,6 +209,17 @@ public partial class Rpm2Context : DbContext
                 .HasConstraintName("FK__PosOrder__Produc__59063A47");
         });
 
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.IdRole).HasName("PK__Roles__43DCD32D04061390");
+
+            entity.Property(e => e.IdRole).HasColumnName("ID_Role");
+            entity.Property(e => e.RoleName)
+                .HasMaxLength(30)
+                .IsUnicode(false)
+                .HasColumnName("Role_name");
+        });
+
         modelBuilder.Entity<StatusOrder>(entity =>
         {
             entity.HasKey(e => e.IdStatus).HasName("PK__Status_o__5AC2A7348D4476E8");
@@ -239,6 +256,12 @@ public partial class Rpm2Context : DbContext
             entity.Property(e => e.RegistrationDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnName("Registration_date");
+            entity.Property(e => e.RoleId).HasColumnName("Role_ID");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.Users)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Users__Role_ID__6FE99F9F");
         });
 
         OnModelCreatingPartial(modelBuilder);

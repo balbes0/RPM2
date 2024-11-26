@@ -1,6 +1,10 @@
 ﻿@{
     ViewData["Title"] = "Авторизация";
 }
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
 
 <div class="container mt-5">
     <h1 class="text-center">Войти в аккаунт</h1>

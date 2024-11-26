@@ -1,6 +1,10 @@
 ﻿@{
     ViewData["Title"] = "Регистрация";
 }
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
 
 <div class="container mt-5">
     <h1 class="text-center">Регистрация</h1>
@@ -11,8 +15,8 @@
                 <div class="card-body">
                     <form method="post" action="/Home/Register">
                         <div class="form-group mb-3">
-                            <label for="name">Имя</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="Введите ваше имя" required>
+                            <label for="name">Номер</label>
+                            <input type="text" class="form-control" id="phonenumber" name="phonenumber" placeholder="Введите ваш номер телефона" required>
                         </div>
 
                         <div class="form-group mb-3">
