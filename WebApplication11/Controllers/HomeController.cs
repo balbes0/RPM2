@@ -154,7 +154,7 @@ namespace WebApplication11.Controllers
             }
 
             // Проверка пароля
-            string hashedPassword = ComputeSha256Hash(password);  // Сравниваем введённый пароль с хэшированным в базе данных
+            string hashedPassword = ComputeSha256Hash(password);
             if (hashedPassword != user.Password)
             {
                 ViewBag.ErrorMessage = "Неверный пароль.";
@@ -178,10 +178,8 @@ namespace WebApplication11.Controllers
 
             int? isuser = HttpContext.Session.GetInt32("UserID");
 
-            // Получаем информацию о пользователе из базы данных
             var user = db.Users.SingleOrDefault(u => u.IdUser == isuser);
 
-            // Передаем объект пользователя в представление
             return View(user);
         }
 
@@ -196,24 +194,142 @@ namespace WebApplication11.Controllers
             return View();
         }
 
-        public IActionResult Catalog()
+        public async Task<IActionResult> Catalog(string filter, string search, string sort)
         {
-            return View();
+            var catalogs = db.Catalogs.AsQueryable();
+            var userid = HttpContext.Session.GetInt32("UserID");
+
+            // Фильтрация
+            if (!string.IsNullOrEmpty(filter))
+            {
+                catalogs = catalogs.Where(c => c.CategoryName == filter);
+            }
+
+            // Поиск
+            if (!string.IsNullOrEmpty(search))
+            {
+                catalogs = catalogs.Where(c => c.ProductName.Contains(search) || c.Description.Contains(search));
+            }
+
+            // Сортировка
+            if (!string.IsNullOrEmpty(sort))
+            {
+                catalogs = sort switch
+                {
+                    "price-asc" => catalogs.OrderBy(c => c.Price),
+                    "price-desc" => catalogs.OrderByDescending(c => c.Price),
+                    _ => catalogs
+                };
+            }
+
+            if (userid != null)
+            {
+                var cartItems = await db.Carts.Where(c => c.UserId == userid).ToListAsync();
+
+                foreach (var item in catalogs)
+                {
+                    item.IsInCart = cartItems.Any(c => c.ProductId == item.IdProduct);
+                }
+            }
+
+            return View(await catalogs.ToListAsync());
         }
+
 
         public IActionResult AboutUs()
         {
             return View();
         }
 
-        public IActionResult Favorites()
+        public async Task<IActionResult> Cart()
         {
-            return View();
+            int? userId = HttpContext.Session.GetInt32("UserID");
+
+            if (userId == null)
+            {
+                return RedirectToAction("Authorization");
+            }
+
+            // Получаем все товары из корзины пользователя с навигационными свойствами (Product)
+            var cartItems = await db.Carts
+                .Where(c => c.UserId == userId)
+                .Include(c => c.Product)  // Подключаем товар (Catalog)
+                .ToListAsync();
+
+            // Передаем корзину в представление
+            return View(cartItems);
         }
 
-        public IActionResult Cart()
+
+        [HttpPost]
+        public IActionResult AddToCart(int productId)
         {
-            return View();
+            int? isuser = HttpContext.Session.GetInt32("UserID");
+            if (isuser != null)
+            {
+                var productToCart = new Cart
+                {
+                    UserId = isuser.Value,
+                    ProductId = productId
+                };
+
+                db.Carts.Add(productToCart);
+                db.SaveChanges();
+                return RedirectToAction("Catalog");
+            }
+            else
+            {
+                return RedirectToAction("Authorization");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult UpdateCartQuantity(int productId, int quantity)
+        {
+            int? isuser = HttpContext.Session.GetInt32("UserID");
+            if (isuser != null)
+            {
+                var cartItem = db.Carts.FirstOrDefault(c => c.UserId == isuser.Value && c.ProductId == productId);
+                if (cartItem != null)
+                {
+                    cartItem.Quantity = quantity;  // Обновление количества товара
+                    db.SaveChanges();
+                }
+                return RedirectToAction("Cart");
+            }
+            else
+            {
+                return RedirectToAction("Authorization");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult RemoveCartItem(int productId, string redirectTo)
+        {
+            int? isuser = HttpContext.Session.GetInt32("UserID");
+            if (isuser != null)
+            {
+                var cartItem = db.Carts.FirstOrDefault(c => c.UserId == isuser.Value && c.ProductId == productId);
+                if (cartItem != null)
+                {
+                    db.Carts.Remove(cartItem);
+                    db.SaveChanges();
+                }
+
+                // Проверяем, куда нужно перенаправить
+                if (redirectTo == "Cart")
+                {
+                    return RedirectToAction("Cart"); // Перенаправляем на страницу корзины
+                }
+                else
+                {
+                    return RedirectToAction("Catalog"); // Перенаправляем на каталог
+                }
+            }
+            else
+            {
+                return RedirectToAction("Authorization");
+            }
         }
 
         public IActionResult Order()

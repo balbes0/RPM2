@@ -7,7 +7,7 @@
 
     // Получаем относительные пути к файлам
     var fileNames = Directory.GetFiles(fullPath)
-                              .Select(file => System.IO.Path.Combine(basePath, System.IO.Path.GetFileName(file))) // Формируем относительный путь
+                              .Select(file => "\\" + System.IO.Path.Combine(basePath, System.IO.Path.GetFileName(file))) // Формируем относительный путь
                               .ToList();
 
     string[] categories = new string[] { "Барашка", "Свинина", "Говядина" };

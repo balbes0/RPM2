@@ -15,6 +15,8 @@ public partial class Rpm2Context : DbContext
     {
     }
 
+    public virtual DbSet<Cart> Carts { get; set; }
+
     public virtual DbSet<Catalog> Catalogs { get; set; }
 
     public virtual DbSet<Delivery> Deliveries { get; set; }
@@ -39,9 +41,30 @@ public partial class Rpm2Context : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Cart>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.ProductId }).HasName("PK__Cart__99EEDE29B04CCF63");
+
+            entity.ToTable("Cart");
+
+            entity.Property(e => e.UserId).HasColumnName("User_ID");
+            entity.Property(e => e.ProductId).HasColumnName("Product_ID");
+            entity.Property(e => e.Quantity).HasDefaultValue(1);
+
+            entity.HasOne(d => d.Product).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Cart__Product_ID__04E4BC85");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Cart__User_ID__03F0984C");
+        });
+
         modelBuilder.Entity<Catalog>(entity =>
         {
-            entity.HasKey(e => e.IdProduct).HasName("PK__Catalog__522DE496B7EFD62E");
+            entity.HasKey(e => e.IdProduct).HasName("PK__Catalog__522DE4968C0046CB");
 
             entity.ToTable("Catalog");
 
@@ -67,7 +90,7 @@ public partial class Rpm2Context : DbContext
 
         modelBuilder.Entity<Delivery>(entity =>
         {
-            entity.HasKey(e => e.IdDelivery).HasName("PK__Delivery__02E3B7D04CEB56E8");
+            entity.HasKey(e => e.IdDelivery).HasName("PK__Delivery__02E3B7D000A2320E");
 
             entity.ToTable("Delivery");
 
@@ -83,17 +106,17 @@ public partial class Rpm2Context : DbContext
             entity.HasOne(d => d.DeliveryStatus).WithMany(p => p.Deliveries)
                 .HasForeignKey(d => d.DeliveryStatusId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Delivery__Delive__68487DD7");
+                .HasConstraintName("FK__Delivery__Delive__6B24EA82");
 
             entity.HasOne(d => d.Order).WithMany(p => p.Deliveries)
                 .HasForeignKey(d => d.OrderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Delivery__Order___6754599E");
+                .HasConstraintName("FK__Delivery__Order___6A30C649");
         });
 
         modelBuilder.Entity<DeliveryStatus>(entity =>
         {
-            entity.HasKey(e => e.IdDeliveryStatus).HasName("PK__Delivery__DD9936FCF494A92E");
+            entity.HasKey(e => e.IdDeliveryStatus).HasName("PK__Delivery__DD9936FC90A8C3F1");
 
             entity.ToTable("Delivery_status");
 
@@ -106,7 +129,7 @@ public partial class Rpm2Context : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.IdOrder).HasName("PK__Orders__EC9FA955E09FCC59");
+            entity.HasKey(e => e.IdOrder).HasName("PK__Orders__EC9FA95566B5A3E0");
 
             entity.Property(e => e.IdOrder).HasColumnName("ID_Order");
             entity.Property(e => e.DeliveryDate).HasColumnName("Delivery_date");
@@ -122,17 +145,17 @@ public partial class Rpm2Context : DbContext
             entity.HasOne(d => d.Status).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.StatusId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Orders__Status_I__5535A963");
+                .HasConstraintName("FK__Orders__Status_I__5812160E");
 
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Orders__User_ID__534D60F1");
+                .HasConstraintName("FK__Orders__User_ID__5629CD9C");
         });
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.IdPayment).HasName("PK__Payment__C2118ADE7D567CEC");
+            entity.HasKey(e => e.IdPayment).HasName("PK__Payment__C2118ADE08180388");
 
             entity.ToTable("Payment");
 
@@ -148,22 +171,22 @@ public partial class Rpm2Context : DbContext
             entity.HasOne(d => d.Order).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.OrderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Payment__Order_I__5FB337D6");
+                .HasConstraintName("FK__Payment__Order_I__628FA481");
 
             entity.HasOne(d => d.PaymentMethod).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.PaymentMethodId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Payment__Payment__619B8048");
+                .HasConstraintName("FK__Payment__Payment__6477ECF3");
 
             entity.HasOne(d => d.PaymentStatus).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.PaymentStatusId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Payment__Payment__628FA481");
+                .HasConstraintName("FK__Payment__Payment__656C112C");
         });
 
         modelBuilder.Entity<PaymentMethod>(entity =>
         {
-            entity.HasKey(e => e.IdPaymentMethod).HasName("PK__Payment___863AB40703441858");
+            entity.HasKey(e => e.IdPaymentMethod).HasName("PK__Payment___863AB407C5CE04E6");
 
             entity.ToTable("Payment_methods");
 
@@ -176,7 +199,7 @@ public partial class Rpm2Context : DbContext
 
         modelBuilder.Entity<PaymentStatus>(entity =>
         {
-            entity.HasKey(e => e.IdPaymentStatus).HasName("PK__Payment___5790CA4B772AD8B1");
+            entity.HasKey(e => e.IdPaymentStatus).HasName("PK__Payment___5790CA4B76F5F445");
 
             entity.ToTable("Payment_status");
 
@@ -189,7 +212,7 @@ public partial class Rpm2Context : DbContext
 
         modelBuilder.Entity<PosOrder>(entity =>
         {
-            entity.HasKey(e => e.IdPos).HasName("PK__PosOrder__20AED5AF69D800EF");
+            entity.HasKey(e => e.IdPos).HasName("PK__PosOrder__20AED5AF6B54A7E7");
 
             entity.ToTable("PosOrder");
 
@@ -201,17 +224,17 @@ public partial class Rpm2Context : DbContext
             entity.HasOne(d => d.Order).WithMany(p => p.PosOrders)
                 .HasForeignKey(d => d.OrderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosOrder__Order___5812160E");
+                .HasConstraintName("FK__PosOrder__Order___5AEE82B9");
 
             entity.HasOne(d => d.Product).WithMany(p => p.PosOrders)
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosOrder__Produc__59063A47");
+                .HasConstraintName("FK__PosOrder__Produc__5BE2A6F2");
         });
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.IdRole).HasName("PK__Roles__43DCD32D04061390");
+            entity.HasKey(e => e.IdRole).HasName("PK__Roles__43DCD32DF6516443");
 
             entity.Property(e => e.IdRole).HasColumnName("ID_Role");
             entity.Property(e => e.RoleName)
@@ -222,7 +245,7 @@ public partial class Rpm2Context : DbContext
 
         modelBuilder.Entity<StatusOrder>(entity =>
         {
-            entity.HasKey(e => e.IdStatus).HasName("PK__Status_o__5AC2A7348D4476E8");
+            entity.HasKey(e => e.IdStatus).HasName("PK__Status_o__5AC2A7343F7BD9F8");
 
             entity.ToTable("Status_order");
 
@@ -234,11 +257,11 @@ public partial class Rpm2Context : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.IdUser).HasName("PK__Users__ED4DE442F4988BD1");
+            entity.HasKey(e => e.IdUser).HasName("PK__Users__ED4DE442803E3A0F");
 
-            entity.HasIndex(e => e.Phone, "UQ__Users__5C7E359EB5E9E70F").IsUnique();
+            entity.HasIndex(e => e.Phone, "UQ__Users__5C7E359E0319A0B6").IsUnique();
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D105344889991D").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D1053412DDD388").IsUnique();
 
             entity.Property(e => e.IdUser).HasColumnName("ID_User");
             entity.Property(e => e.Address)
@@ -251,7 +274,7 @@ public partial class Rpm2Context : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false);
             entity.Property(e => e.Phone)
-                .HasMaxLength(11)
+                .HasMaxLength(12)
                 .IsUnicode(false);
             entity.Property(e => e.RegistrationDate)
                 .HasDefaultValueSql("(getdate())")
@@ -261,7 +284,7 @@ public partial class Rpm2Context : DbContext
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Users__Role_ID__6FE99F9F");
+                .HasConstraintName("FK__Users__Role_ID__6C190EBB");
         });
 
         OnModelCreatingPartial(modelBuilder);

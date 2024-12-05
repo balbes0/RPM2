@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApplication11.Models;
 
@@ -21,5 +22,10 @@ public partial class Catalog
 
     public string? PathToImage { get; set; }
 
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+
     public virtual ICollection<PosOrder> PosOrders { get; set; } = new List<PosOrder>();
+
+    [NotMapped]
+    public bool IsInCart { get; set; }
 }
